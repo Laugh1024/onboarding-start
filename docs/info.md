@@ -9,11 +9,13 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-How it works placeholder text
+An SPI-controlled PWM peripheral. An SPI controller writes to five registers
+(output enables, PWM enables, and a duty cycle), and the PWM module drives
+16 outputs based on those registers.
 
 ## How to test
 
-How to test placeholder text
+Run `make -B` in the `test` folder.
 
 ## External hardware
 
