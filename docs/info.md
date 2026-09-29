@@ -9,14 +9,12 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-An SPI-controlled PWM peripheral. An SPI controller writes to five registers
-(output enables, PWM enables, and a duty cycle), and the PWM module drives
-16 outputs based on those registers.
+An spi peripheral controls a pwm peripheral. An SPI controller inputs into five registers, and the PWM module controls 16 outputs based on those registers.
 
 ## How to test
 
-Run `make -B` in the `test` folder.
+Run make -B in the test folder.
 
 ## External hardware
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+None
