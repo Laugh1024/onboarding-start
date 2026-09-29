@@ -5,9 +5,9 @@ module spi_peripheral (
     input  wire clk,       // chip's own clock
     input  wire rst_n,     // active-low reset
 
-    input  wire sclk_raw,  // raw SCLK pin (from ui_in[0])
-    input  wire copi_raw,  // raw COPI pin (from ui_in[1])
-    input  wire ncs_raw,   // raw nCS pin  (from ui_in[2])
+    input  wire sclk_raw,
+    input  wire copi_raw, 
+    input  wire ncs_raw,
 
     output reg [7:0] en_reg_out_7_0,
     output reg [7:0] en_reg_out_15_8,
@@ -18,9 +18,6 @@ module spi_peripheral (
 
   localparam MAX_ADDRESS = 7'h04;
 
-  // ---------------------------------------------------------
-  // Stage 1: CDC synchronizers
-  // ---------------------------------------------------------
   reg sclk_sync0, sclk_sync1, sclk_sync2;
   reg copi_sync0, copi_sync1;
   reg ncs_sync0,  ncs_sync1,  ncs_sync2;
@@ -37,16 +34,10 @@ module spi_peripheral (
     end
   end
 
-  // ---------------------------------------------------------
-  // Stage 2: Edge detection
-  // ---------------------------------------------------------
   wire sclk_posedge = (sclk_sync2 == 1'b0) && (sclk_sync1 == 1'b1);
   wire ncs_negedge  = (ncs_sync2  == 1'b1) && (ncs_sync1  == 1'b0);
   wire ncs_posedge  = (ncs_sync2  == 1'b0) && (ncs_sync1  == 1'b1);
 
-  // ---------------------------------------------------------
-  // Stage 3: Collect the 16 bits while nCS is low
-  // ---------------------------------------------------------
   reg [15:0] shift_reg;
   reg [4:0]  bit_count;
   reg        transaction_ready;
@@ -73,9 +64,6 @@ module spi_peripheral (
     end
   end
 
-  // ---------------------------------------------------------
-  // Stage 4: Check the transaction and update the registers
-  // ---------------------------------------------------------
   wire       rw_bit  = shift_reg[15];
   wire [6:0] address = shift_reg[14:8];
   wire [7:0] data    = shift_reg[7:0];
