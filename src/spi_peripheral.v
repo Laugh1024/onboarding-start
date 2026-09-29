@@ -18,9 +18,14 @@ module spi_peripheral (
 
   localparam MAX_ADDRESS = 7'h04;
 
-  reg sclk_sync0, sclk_sync1, sclk_sync2;
-  reg copi_sync0, copi_sync1;
-  reg ncs_sync0,  ncs_sync1,  ncs_sync2;
+  reg sclk_sync0;
+  reg sclk_sync1;
+  reg sclk_sync2;
+  reg copi_sync0;
+  reg copi_sync1;
+  reg ncs_sync0;
+  reg ncs_sync1;
+  reg ncs_sync2;
 
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
