@@ -151,29 +151,22 @@ async def test_spi(dut):
 
 @cocotb.test()
 async def test_pwm_freq(dut):
-    dut._log.info("Start PWM frequency test")
-
-    # Same clock setup as test_spi: 100 ns period = 10 MHz
     clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
 
-    # Same reset sequence as test_spi
     dut.ena.value = 1
-    dut.ui_in.value = ui_in_logicarray(1, 0, 0)  # nCS idle high
+    dut.ui_in.value = ui_in_logicarray(1, 0, 0)
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 5)
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 5)
 
-    # Enable output 0, turn on PWM mode for it, set duty cycle to 50%
-    await send_spi_transaction(dut, 1, 0x00, 0x01)  # en_reg_out_7_0: enable uo_out[0]
-    await send_spi_transaction(dut, 1, 0x02, 0x01)  # en_reg_pwm_7_0: PWM mode for uo_out[0]
-    await send_spi_transaction(dut, 1, 0x04, 0x80)  # pwm_duty_cycle: 0x80 ≈ 50%
+    await send_spi_transaction(dut, 1, 0x00, 0x01)
+    await send_spi_transaction(dut, 1, 0x02, 0x01)
+    await send_spi_transaction(dut, 1, 0x04, 0x80) 
 
-    # Wait for the PWM signal to stabilize, then watch uo_out[0]
     await ClockCycles(dut.clk, 100)
 
-    # Measure the time between two rising edges of uo_out[0], by polling manually
     async def wait_for_bit_rising_edge(dut, bit_index):
         prev = (int(dut.uo_out.value) >> bit_index) & 1
         while True:
@@ -232,7 +225,7 @@ async def test_pwm_duty(dut):
                 return
             prev = curr
 
-    # ---- Case 1: 50% duty cycle ----
+    #50% Duty Cycle
     await send_spi_transaction(dut, 1, 0x04, 0x80)
     await ClockCycles(dut.clk, 100)
 
@@ -252,13 +245,13 @@ async def test_pwm_duty(dut):
     dut._log.info(f"50%% case: on_time={on_time}ns, period={period}ns, duty={duty_percent:.2f}%")
     assert 49 <= duty_percent <= 51, f"Expected ~50%, got {duty_percent:.2f}%"
 
-    # ---- Case 2: 0% duty cycle ----
+    #0% Duty Cycle
     await send_spi_transaction(dut, 1, 0x04, 0x00)
     await ClockCycles(dut.clk, 10000)
     assert dut.uo_out.value & 1 == 0, "Expected output to stay low at 0% duty cycle"
     dut._log.info("0% case: output stayed low, as expected")
 
-    # ---- Case 3: 100% duty cycle ----
+    #100% Duty Cycle
     await send_spi_transaction(dut, 1, 0x04, 0xFF)
     await ClockCycles(dut.clk, 10000)
     assert dut.uo_out.value & 1 == 1, "Expected output to stay high at 100% duty cycle"
